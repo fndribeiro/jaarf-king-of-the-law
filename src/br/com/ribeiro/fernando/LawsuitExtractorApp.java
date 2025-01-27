@@ -28,8 +28,10 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 public class LawsuitExtractorApp {
 
     private static String outputFolderPath = "";
+    private static List<String> skippedLawsuits = new ArrayList<>(); 
 
     public static void main(String[] args) {
+    	skippedLawsuits.clear();
         SwingUtilities.invokeLater(LawsuitExtractorApp::createAndShowGUI);
     }
 
@@ -139,6 +141,14 @@ public class LawsuitExtractorApp {
                         for (Map.Entry<String, List<LawsuitInfo>> entry : lawsuitsByLawyer.entrySet()) {
                             createDocxFileForLawyer(entry.getKey(), entry.getValue());
                         }
+                        
+                        if (!skippedLawsuits.isEmpty()) {
+                            StringBuilder skippedMessage = new StringBuilder("Processos ignorados por conter execução fiscal, tribunal de contas ou tributário:\n");
+                            for (String skipped : skippedLawsuits) {
+                                skippedMessage.append(skipped).append("\n");
+                            }
+                            JOptionPane.showMessageDialog(null, skippedMessage.toString(), "Processos ignorados:", JOptionPane.INFORMATION_MESSAGE);
+                        }
 
                         SwingUtilities.invokeLater(() -> {
                             loadingFrame.dispose();
@@ -182,24 +192,42 @@ public class LawsuitExtractorApp {
     }
 
     private static void createDocxFileForLawyer(String lawyer, List<LawsuitInfo> lawsuits) {
+    	
         try (XWPFDocument doc = new XWPFDocument()) {
+        	
             File outputFile = new File(outputFolderPath, lawyer + ".docx");
 
             for (LawsuitInfo lawsuit : lawsuits) {
+            	
+            	String description = extractDescription(lawsuit.getFullText());
+            	
+            	// Check for keywords in the description
+                if (description.toLowerCase().contains("execução fiscal") ||
+                    description.toLowerCase().contains("tribunal de contas") ||
+                    description.toLowerCase().contains("tributário")) {
+                	
+                    skippedLawsuits.add(lawsuit.getLawsuitNumber());  // Add to the skipped list
+
+                    continue; // Skip this iteration if any keyword is foundip this iteration if any keyword is found
+                    
+                }
+                
                 XWPFParagraph paragraph = doc.createParagraph();
                 XWPFRun run = paragraph.createRun();
                 run.setText("Data: " + lawsuit.getDate());
                 run.addBreak();
                 run.setText("Processo: " + lawsuit.getLawsuitNumber());
                 run.addBreak();
-                run.setText(extractDescription(lawsuit.getFullText()));
+                run.setText(description);
                 run.addBreak();
                 run.addBreak();
+                
             }
 
             try (FileOutputStream out = new FileOutputStream(outputFile)) {
                 doc.write(out);
             }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
