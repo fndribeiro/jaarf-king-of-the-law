@@ -117,20 +117,36 @@ public class LawsuitExtractorApp {
                         Map<String, List<LawsuitInfo>> lawsuitsByLawyer = new HashMap<>();
 
                         for (LawsuitInfo lawsuit : lawsuits) {
-                            String firstBlock = lawsuit.getLawsuitNumber().split("-")[0];
+                        	
+                        	String firstBlock = lawsuit.getLawsuitNumber().split("-")[0];
 
-                            // Assign lawsuits to the correct lawyer
+                            // Find the effective digit by checking backward until it's not 9 or 0
+                            int index = firstBlock.length() - 1;
+                            while (index >= 0 && (firstBlock.charAt(index) == '9' || firstBlock.charAt(index) == '0')) {
+                                index--; // Move backward
+                            }
+
+                            // Determine the effective digit or set to 'n' if none is found
+                            char effectiveDigit = (index >= 0) ? firstBlock.charAt(index) : 'n'; // 'n' represents "Nao Encontrado"
+
+                            // Assign lawsuits to the correct lawyer based on the effectiveDigit
                             String lawyer;
-                            if (firstBlock.matches(".*[12]$")) {
-                                lawyer = "Fernando";
-                            } else if (firstBlock.matches(".*[34]$")) {
-                                lawyer = "Rafael";
-                            } else if (firstBlock.matches(".*[56]$")) {
-                                lawyer = "Joao";
-                            } else if (firstBlock.matches(".*[78]$")) {
-                                lawyer = "Izabella"; // Catch-all for unmatched cases
-                            } else {
-                            	lawyer = "Nao Encontrado"; // Catch-all for unmatched cases
+                            switch (effectiveDigit) {
+                                case '1': case '2':
+                                    lawyer = "Fernando";
+                                    break;
+                                case '3': case '4':
+                                    lawyer = "Rafael";
+                                    break;
+                                case '5': case '6':
+                                    lawyer = "Joao";
+                                    break;
+                                case '7': case '8':
+                                    lawyer = "Izabella";
+                                    break;
+                                default:
+                                    lawyer = "Nao Encontrado"; // Catch-all for unmatched or invalid cases
+                                    
                             }
 
                             // Group lawsuits by lawyer

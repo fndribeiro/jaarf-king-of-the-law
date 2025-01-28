@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jaarf-king-of-the-law</groupId>
 	<artifactId>jaarf-king-of-the-law</artifactId>
-	<version>1.0.0</version>
+	<version>1.2</version>
 	<name>Jaarf King of the Law</name>
 	<dependencies>
 		<dependency>
