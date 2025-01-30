@@ -136,10 +136,10 @@ public class LawsuitExtractorApp {
                                     lawyer = "Fernando";
                                     break;
                                 case '3': case '4':
-                                    lawyer = "Rafael";
+                                    lawyer = "Joao";
                                     break;
                                 case '5': case '6':
-                                    lawyer = "Joao";
+                                    lawyer = "Rafael";
                                     break;
                                 case '7': case '8':
                                     lawyer = "Izabella";
