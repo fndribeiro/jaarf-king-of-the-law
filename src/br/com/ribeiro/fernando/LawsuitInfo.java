@@ -23,8 +23,5 @@ public class LawsuitInfo {
 	public String getFullText() {
 		return fullText;
 	}
-	
-	
-	
 
 }
