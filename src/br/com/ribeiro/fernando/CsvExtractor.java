@@ -21,6 +21,7 @@ public class CsvExtractor {
 
     private static final Pattern LAWSUIT_PATTERN = Pattern.compile("\\d{6,7}-\\d{2}\\.\\d{4}\\.\\d\\.\\d{2}\\.\\d{4}");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private static final DateTimeFormatter DATE_FORMATTER_FALLBACK = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final File csvFile;
     private final String outputFolderPath;
@@ -93,7 +94,15 @@ public class CsvExtractor {
             LocalDate date = LocalDate.parse(columns[3], DATE_FORMATTER);
             return date.equals(LocalDate.now().minusDays(1));
         } catch (Exception e) {
-            return false;
+        	
+        	try {
+        		LocalDate date = LocalDate.parse(columns[3], DATE_FORMATTER_FALLBACK);
+                return date.equals(LocalDate.now().minusDays(1));
+			} catch (Exception e2) {
+				e2.printStackTrace();
+	            return false;
+			}
+        	
         }
     }
 
